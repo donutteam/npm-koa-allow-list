@@ -42,8 +42,12 @@ export class AllowListMiddleware
 	 * @param {Array<String>} [options.ips] An array of IP addresses to allow. Optional, technically, but you should specify at least one...
 	 * @author Loren Goodwin
 	 */
-	constructor()
+	constructor(options)
 	{
+		this.blockLocalRequests = options.blockLocalRequests ?? this.blockLocalRequests;
+
+		this.ips = options.ips ?? this.ips;
+
 		this.execute = async (context, next) =>
 		{
 			//

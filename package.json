@@ -1,6 +1,6 @@
 {
   "name": "@donutteam/koa-allow-list",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A class for creating Koa middlewares that reject requests that aren't on the allow list.",
   "main": "./index.js",
   "scripts": {

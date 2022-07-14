@@ -23,9 +23,9 @@ export class AllowListMiddleware
 	/**
 	 * A set of IP addresses that are allowed to continue.
 	 *
-	 * @type {Array<String>}
+	 * @type {Set<String>}
 	 */
-	ips = [];
+	ips = new Set();
 
 	/**
 	 * The middleware function.
@@ -46,7 +46,7 @@ export class AllowListMiddleware
 	{
 		this.blockLocalRequests = options.blockLocalRequests ?? this.blockLocalRequests;
 
-		this.ips = options.ips ?? this.ips;
+		this.ips = new Set(options.ips);
 
 		this.execute = async (context, next) =>
 		{
@@ -60,7 +60,7 @@ export class AllowListMiddleware
 			{
 				isAllowed = true;
 			}
-			else if (this.ips.indexOf(context.ip) != -1)
+			else if (this.ips.has(context.ip))
 			{
 				isAllowed = true;
 			}

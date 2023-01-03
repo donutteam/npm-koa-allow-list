@@ -3,46 +3,39 @@
 //
 
 import isLocalIp from "is-local-ip";
+import { Middleware } from "koa";
 
 //
 // Allow List Middleware
 //
 
-/**
- * A class for creating middlewares that only allow specific IPs to continue down the stack.
- */
+export interface AllowListMiddlewareOptions
+{
+	/** Whether or not to block requests from local addresses that aren't on the allow list. Optional, defaults to false. */
+	blockLocalRequests : boolean;
+
+	/** An array of IP addresses to allow. Optional, technically, but you should specify at least one... */
+	ips : string[];
+}
+
+/** A class for creating middlewares that only allow specific IPs to continue down the stack. */
 export class AllowListMiddleware
 {
-	/**
-	 * Whether or not to block local requests unless they're on the allow list.
-	 * 
-	 * @type {Boolean}
-	 */
+	/** Whether or not to block local requests unless they're on the allow list. */
 	blockLocalRequests = false;
 
-	/**
-	 * A set of IP addresses that are allowed to continue.
-	 *
-	 * @type {Set<String>}
-	 */
-	ips = new Set();
+	/** A set of IP addresses that are allowed to continue. */
+	ips : Set<string> = new Set();
 
-	/**
-	 * The middleware function.
-	 * 
-	 * @type {import("koa").Middleware}
-	 */
-	execute;
+	/** The middleware function. */
+	execute : Middleware;
 
 	/**
 	 * Constructs a new AllowListMiddleware.
 	 *
-	 * @param {Object} [options] Options for the middleware.
-	 * @param {Boolean} [options.blockLocalRequests] Whether or not to block requests from local addresses that aren't on the allow list. Optional, defaults to false.
-	 * @param {Array<String>} [options.ips] An array of IP addresses to allow. Optional, technically, but you should specify at least one...
 	 * @author Loren Goodwin
 	 */
-	constructor(options)
+	constructor(options : AllowListMiddlewareOptions)
 	{
 		this.blockLocalRequests = options.blockLocalRequests ?? this.blockLocalRequests;
 

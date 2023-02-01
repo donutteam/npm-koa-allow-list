@@ -12,23 +12,23 @@ import { Middleware } from "koa";
 export interface AllowListMiddlewareOptions
 {
 	/** Whether or not to block requests from local addresses that aren't on the allow list. Optional, defaults to false. */
-	blockLocalRequests : boolean;
+	blockLocalRequests? : boolean;
 
 	/** An array of IP addresses to allow. Optional, technically, but you should specify at least one... */
-	ips : string[];
+	ips? : string[];
 }
 
 /** A class for creating middlewares that only allow specific IPs to continue down the stack. */
 export class AllowListMiddleware
 {
-	/** Whether or not to block local requests unless they're on the allow list. */
-	blockLocalRequests = false;
+	/** The original options passed to this middleware. */
+	readonly options : AllowListMiddlewareOptions;
 
 	/** A set of IP addresses that are allowed to continue. */
 	ips : Set<string> = new Set();
 
 	/** The middleware function. */
-	execute : Middleware;
+	readonly execute : Middleware;
 
 	/**
 	 * Constructs a new AllowListMiddleware.
@@ -37,9 +37,25 @@ export class AllowListMiddleware
 	 */
 	constructor(options : AllowListMiddlewareOptions)
 	{
-		this.blockLocalRequests = options.blockLocalRequests ?? this.blockLocalRequests;
+		//
+		// Default Options
+		//
 
-		this.ips = new Set(options.ips);
+		this.options = options ?? {};
+
+		this.options.blockLocalRequests ??= false;
+
+		this.options.ips ??= [];
+
+		//
+		// Create IPs Set
+		//
+
+		this.ips = new Set(this.options.ips);
+
+		//
+		// Create Execute Function
+		//
 
 		this.execute = async (context, next) =>
 		{
@@ -49,7 +65,7 @@ export class AllowListMiddleware
 
 			let isAllowed = false;
 
-			if (!this.blockLocalRequests && isLocalIp(context.ip))
+			if (!this.options.blockLocalRequests && isLocalIp(context.ip))
 			{
 				isAllowed = true;
 			}
@@ -67,6 +83,10 @@ export class AllowListMiddleware
 
 				return;
 			}
+
+			//
+			// Execute Next Middleware
+			//
 
 			await next();
 		};
